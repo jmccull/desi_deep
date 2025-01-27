@@ -1,7 +1,7 @@
 # overall settings
 settings:
     prognum : 9999
-    targdir : "/pscratch/sd/b/bid13/photo_z_spare_fiber/tertiary/fba_output"
+    targdir : "/pscratch/sd/b/bid13/photo_z_spare_fiber/desi_deep/fiber_assign/fba_output"
     ntile : 15
     tileid_start : 999000
     rundate : "2025-01-22T17:00:00+00:00"
@@ -15,4 +15,4 @@ settings:
 
 # per-sample settings
 samples:
-    LSST_Y1 : {"PRIORITY_INIT" : 9000, "NGOAL" : 15, "CHECKER" : "BD", "FN" : "COSMOS_LSSTY1_target_list.fits"}
+    LSST_Y1 : {"PRIORITY_INIT" : 9000, "NGOAL" : 15, "CHECKER" : "BD", "FN" : "/global/cfs/cdirs/desi/users/bid13/DESI_II/TEST1_COSMOS_LSSTY1_target_list.fits"}

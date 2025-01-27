@@ -7,4 +7,4 @@ mv ./fba_output/*.yaml ./
 rm -r ./fba_output/*
 mv ./*.yaml ./fba_output
 
-python desi_fba_tertiary_9999.py --yamlfn tertiary-config-9999.yaml
+python desi_fba_tertiary_9999.py --yamlfn ./fba_output/tertiary-config-9999.yaml
