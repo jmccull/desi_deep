@@ -1,0 +1,18 @@
+# overall settings
+settings:
+    prognum : 9999
+    targdir : "/pscratch/sd/b/bid13/photo_z_spare_fiber/tertiary/fba_output"
+    ntile : 15
+    tileid_start : 999000
+    rundate : "2025-01-22T17:00:00+00:00"
+    obsconds : "DARK"
+    sbprof : "ELG"
+    goaltime : 1000
+    std_dtver : "1.1.1"
+    np_rand_seed : 1234
+    field_ra : 150.00
+    field_dec : 2.00
+
+# per-sample settings
+samples:
+    LSST_Y1 : {"PRIORITY_INIT" : 9000, "NGOAL" : 15, "CHECKER" : "BD", "FN" : "COSMOS_LSSTY1_target_list.fits"}
