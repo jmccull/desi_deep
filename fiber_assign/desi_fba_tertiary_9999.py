@@ -14,6 +14,7 @@ from desisurveyops.fba_tertiary_design_io import (
     read_yaml,
     assert_tertiary_settings,
     get_tile_centers_grid,
+    get_tile_centers_rosette,
     create_tiles_table,
     creates_priority_table,
     finalize_target_table,
@@ -63,25 +64,9 @@ def parse():
     return args
 
 
-# AR mimicking the sv3 rosette pattern
-# AR https://desi.lbl.gov/trac/wiki/SurveyOps/OnePercent#Rosettefootprints
-# Creates ntile offsets arranged in a circle of radius rad
-def get_offsets(ntile, rad=0.12):
-    angs = np.pi / 2 + np.linspace(0, 2 * np.pi, ntile + 1)[:-1]
-    dras = rad * np.cos(angs)
-    ddecs = rad * np.sin(angs)
-    return dras, ddecs
 
-
-# AR 4 tiles
-# AR see email from Noah W. from 2024-07-10 2:50PM
-def create_tiles(tileid_start, ntile, field_ra, field_dec, obsconds, outfn):
-    dras, ddecs = get_offsets(ntile, rad=0.12)
-    dras /= np.cos(np.radians(field_dec + ddecs))  # AR correct for dec term
-    tile_ras = field_ra + dras
-    tile_decs = field_dec + ddecs
-    # AR round to 3 digits
-    tile_ras, tile_decs = tile_ras.round(3), tile_decs.round(3)
+def create_tiles(tileid_start, ntile, field_ra, field_dec, obsconds, outfn,rad=0.12):
+    tile_ras, tile_decs = get_tile_centers_rosette(field_ra, field_dec, npt=ntile, rad=rad)
     tileids = np.arange(tileid_start, tileid_start + ntile, dtype=int)
     d = create_tiles_table(tileids, tile_ras, tile_decs, obsconds)
     d.write(outfn)
