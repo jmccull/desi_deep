@@ -8,7 +8,7 @@ from astropy.io import fits
 from astropy.table import Table, vstack
 from desiutil.log import get_logger
 from desiutil.redirect import stdouterr_redirected
-from desisurveyops.fba_tertiary_design_io import (
+from fba_tertiary_design_io import (
     assert_environ_settings,
     get_fn,
     read_yaml,
@@ -21,6 +21,7 @@ from desisurveyops.fba_tertiary_design_io import (
     assert_files,
     create_targets_assign,
     plot_targets_assign,
+    subsample_targets_avail,
 )
 from desitarget.targetmask import desi_mask, bgs_mask
 from argparse import ArgumentParser
@@ -65,8 +66,27 @@ def parse():
 
 
 
-def create_tiles(tileid_start, ntile, field_ra, field_dec, obsconds, outfn,rad=0.12):
-    tile_ras, tile_decs = get_tile_centers_rosette(field_ra, field_dec, npt=ntile, rad=rad)
+def create_tiles(tileid_start, field_ra, field_dec, obsconds, outfn,rad_list, ntile_list, add_center=True):
+   
+    tile_ras = []
+    tile_decs = []
+    ntile = np.sum(ntile_list).astype(int)
+    tile_rads = []
+
+    if add_center:
+        tile_ras.append([field_ra])
+        tile_decs.append([field_dec])
+        ntile+=1
+
+    for grid_rad, grid_n in zip(rad_list,ntile_list):
+        grid_ras, grid_decs = get_tile_centers_rosette(field_ra, field_dec, npt=grid_n, rad=grid_rad)
+        tile_ras.append(grid_ras)
+        tile_decs.append(grid_decs)
+        tile_rads.extend([grid_rad]*grid_n)
+    
+    tile_ras = np.concatenate(tile_ras)
+    tile_decs = np.concatenate(tile_decs)
+   
     tileids = np.arange(tileid_start, tileid_start + ntile, dtype=int)
     d = create_tiles_table(tileids, tile_ras, tile_decs, obsconds)
     d.write(outfn)
@@ -84,11 +104,24 @@ def create_priorities(yamlfn, outfn):
 
 
 def create_targets(yamlfn, outfn):
-    mydict = read_yaml(yamlfn)["samples"]
-    tertiary_target = str(*mydict.keys())
-    d = Table(fitsio.read(mydict[tertiary_target]["FN"]))
-    # d["TERTIARY_TARGET"] = np.zeros(len(d), dtype=object)
-    d["TERTIARY_TARGET"] = tertiary_target
+    mydict = read_yaml(yamlfn)
+    d = Table(fitsio.read(mydict["settings"]["target_list_fn"]))
+    d["TERTIARY_TARGET"] = np.zeros(len(d), dtype=object)
+    
+    for key, value in mydict["samples"].items():
+        mask = (d["I_MAG"]<value["I_MAG_MAX"]) & (d["I_MAG"]>=value["I_MAG_MIN"])
+        d["TERTIARY_TARGET"][mask] = key
+    d["TERTIARY_TARGET"] = d["TERTIARY_TARGET"].astype(str)
+
+   
+    d = subsample_targets_avail(
+        d,
+        mydict["settings"]["prognum"],
+        mydict["settings"]["targdir"],
+        mydict["settings"]["rundate"],
+        
+    )
+    
     # AR finalize
     d = finalize_target_table(d, yamlfn)
     d.meta["RANDSEED"] = read_yaml(yamlfn)["settings"]["np_rand_seed"]
@@ -111,11 +144,12 @@ def main():
         log.info("run create_tiles() to generate {}".format(tilesfn))
         create_tiles(
             mydict["tileid_start"],
-            mydict["ntile"],
             mydict["field_ra"],
             mydict["field_dec"],
             mydict["obsconds"],
             tilesfn,
+            mydict["rosette_rad_list"],
+            mydict["rosette_ntile_list"],
         )
 
     # AR priorities file
