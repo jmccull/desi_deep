@@ -2,9 +2,10 @@
 settings:
     prognum : 9999
     targdir : "/pscratch/sd/b/bid13/photo_z_spare_fiber/desi_deep/fiber_assign/fba_output"
-    ntile : 15
+    rosette_rad_list: [0.12,0.17,0.22,0.27]
+    rosette_ntile_list: [14,20,26,34] #total 94
     tileid_start : 999000
-    rundate : "2025-01-22T17:00:00+00:00"
+    rundate : "2025-04-01T17:00:00+00:00"
     obsconds : "DARK"
     sbprof : "ELG"
     goaltime : 1000
@@ -12,7 +13,13 @@ settings:
     np_rand_seed : 1234
     field_ra : 150.00
     field_dec : 2.00
+    target_list_fn: "/global/cfs/cdirs/desi/users/bid13/DESI_II/TEST3_COSMOS_LSSTY1_target_list.fits"
 
 # per-sample settings
 samples:
-    LSST_Y1 : {"PRIORITY_INIT" : 9000, "NGOAL" : 15, "CHECKER" : "BD", "FN" : "/global/cfs/cdirs/desi/users/bid13/DESI_II/TEST1_COSMOS_LSSTY1_target_list.fits"}
+    LSST_Y1_P1 : {"PRIORITY_INIT" : 9000, "NGOAL" : 75, "CHECKER" : "BD", I_MAG_MIN: 23, I_MAG_MAX: 24.5  }
+    LSST_Y1_P2 : {"PRIORITY_INIT" : 8000, "NGOAL" : 50, "CHECKER" : "BD", I_MAG_MIN: 22, I_MAG_MAX: 23  }
+    LSST_Y1_P3 : {"PRIORITY_INIT" : 7000, "NGOAL" : 8, "CHECKER" : "BD", I_MAG_MIN: 21, I_MAG_MAX: 22  }
+    LSST_Y1_P4 : {"PRIORITY_INIT" : 6000, "NGOAL" : 2, "CHECKER" : "BD", I_MAG_MIN: 20, I_MAG_MAX: 21  }
+    LSST_Y1_P5 : {"PRIORITY_INIT" : 5000, "NGOAL" : 1, "CHECKER" : "BD", I_MAG_MIN: 18, I_MAG_MAX: 20  }
+    
